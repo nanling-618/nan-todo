@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>南寶寶的待辦小本本</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "Microsoft JhengHei", sans-serif;
+      background: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 980px;
+      padding: 32px 24px;
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+    }
+
+    /* 左邊區塊：標題 + 待辦區 */
+    .left {
+      flex: 1.1;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .title-icon {
+      font-size: 2rem;
+      color: #4b63d8;
+    }
+
+    .app-title {
+      margin: 0;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #4b63d8;
+      letter-spacing: 0.08em;
+    }
+
+    .title-underline {
+      height: 4px;
+      width: 100%;
+      max-width: 520px;
+      border-radius: 999px;
+      background: #c7b5ff;
+      margin: 6px 0 12px;
+    }
+
+    .subtitle {
+      margin: 0 0 28px;
+      font-size: 0.95rem;
+      color: #cc6a88;
+    }
+
+    /* 輸入列 */
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 22px;
+      max-width: 460px;
+    }
+
+    .input-row input {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 15px;
+      border: 2px solid #d0c5ff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .input-row input:focus {
+      border-color: #8f8ae6;
+      box-shadow: 0 0 0 3px #ede9ff;
+    }
+
+    .input-row button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      background: #8f8ae6;
+      color: #fff;
+      font-weight: 600;
+      min-width: 72px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease,
+        filter 0.08s ease;
+    }
+
+    .input-row button:hover {
+      filter: brightness(1.05);
+      box-shadow: 0 4px 10px rgba(110, 113, 210, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .input-row button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    /* 待辦清單 */
+    .todo-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 520px;
+    }
+
+    .todo-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #e9ddff;
+      border-left: 16px solid #c4b2ff;
+      color: #5d3d9c;
+      font-size: 0.98rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+
+    .todo-item:nth-child(2n) {
+      background: #f3e6ff;
+      border-left-color: #d2bfff;
+    }
+
+    .todo-item.done {
+      background: #e0f7e9;
+      border-left-color: #7fd1a6;
+      color: #3b6b4f;
+      text-decoration: line-through;
+      opacity: 0.85;
+    }
+
+    .check-box {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid #b7a5ff;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #7e68e6;
+      transition: background 0.12s, border-color 0.12s, transform 0.08s;
+    }
+
+    .todo-item.done .check-box {
+      background: #7fd1a6;
+      border-color: #5cb786;
+      color: #ffffff;
+      transform: scale(1.03);
+    }
+
+    .check-box span {
+      line-height: 1;
+    }
+
+    .todo-text {
+      flex: 1;
+      word-break: break-word;
+    }
+
+    .delete-btn {
+      border: none;
+      background: transparent;
+      color: #b38bd1;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 2px 4px;
+      flex-shrink: 0;
+    }
+
+    .todo-item.done .delete-btn {
+      color: #6ea88a;
+    }
+
+    .empty-hint {
+      margin-top: 6px;
+      font-size: 0.85rem;
+      color: #aaa;
+    }
+
+    /* 右邊小嶺嶺 */
+    .assistant {下午 09:19 2025/11/23
+      flex: 0 0 220px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    .assistant img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* RWD：螢幕窄的時候改上下排列 */
+    @media (max-width: 768px) {
+      .page {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .assistant {
+        order: -1;
+        margin-bottom: 12px;
+      }
+
+      .title-underline {
+        max-width: 100%;
+      }
+
+      .todo-list {
+        max-width: 100%;
+      }
+    }
+    @media (max-width: 480px) {
+      .app-title {
+        font-size: 1.8rem;
+      }
+      .title-icon {
+        font-size: 1.6rem;
+      }
+      .subtitle {
+        font-size: 0.85rem;
+      }
+      .input-row input {
+        font-size: 0.9rem;
+      }
+      .input-row button {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+      }
+      .todo-item {
+        font-size: 0.9rem;
+        padding: 9px 12px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="left">
+      <div class="title-row">
+        <div class="title-icon">✣</div>
+        <h1 class="app-title">南寶寶的待辦小本本</h1>
+      </div>
+      <div class="title-underline"></div>
+      <p class="subtitle">
+        想到什麼就寫下來，勾勾代表完成，超有成就感 (´▽`ʃ♡ƪ)
+      </p>
+
+      <div class="input-row">
+        <input
+          id="todo-input"
+          type="text"
+          placeholder="輸入待辦事項"
+        />
+        <button id="add-btn">新增</button>
+      </div>
+
+      <div id="todo-list" class="todo-list"></div>
+      <p id="empty-hint" class="empty-hint">今天還沒有任務唷～</p>
+    </div>
+
+    <div class="assistant">
+      <!-- 把 ling-helper.png 換成你實際的檔名 -->
+      <img src="ling-helper.png" alt="小嶺嶺助理" />
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById("todo-input");
+    const addBtn = document.getElementById("add-btn");
+    const list = document.getElementById("todo-list");
+    const emptyHint = document.getElementById("empty-hint");
+
+    function updateEmptyHint() {
+      emptyHint.style.display = list.children.length ? "none" : "block";
+    }
+
+    function createItem(text) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "todo-item";
+
+      const check = document.createElement("div");
+      check.className = "check-box";
+      const checkInner = document.createElement("span");
+      checkInner.textContent = "";
+      check.appendChild(checkInner);
+
+      const span = document.createElement("div");
+      span.className = "todo-text";
+      span.textContent = text;
+
+      const del = document.createElement("button");
+      del.className = "delete-btn";
+      del.textContent = "✕";
+
+      check.addEventListener("click", () => {
+        wrapper.classList.toggle("done");
+        checkInner.textContent = wrapper.classList.contains("done") ? "✓" : "";
+      });
+
+      del.addEventListener("click", () => {
+        wrapper.remove();
+        updateEmptyHint();
+      });
+
+      wrapper.appendChild(check);
+      wrapper.appendChild(span);
+      wrapper.appendChild(del);
+
+      return wrapper;
+    }
+
+    function addTodo() {
+      const text = input.value.trim();
+      if (!text) return;
+      const item = createItem(text);
+      list.appendChild(item);
+      input.value = "";
+      input.focus();
+      updateEmptyHint();
+    }
+
+    addBtn.addEventListener("click", addTodo);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") addTodo();
+    });
+
+    // 初始狀態
+    updateEmptyHint();
+
+    // 也可以先塞幾句預設示範
+    const defaults = [
+      "親一下嶺寶寶",
+      "今天的事要今天做完♡",
+      "今天太累了不然明天再做吧Zz(ˊᗜˋ*)"
+    ];
+    defaults.forEach((t) => {
+      const item = createItem(t);
+      list.appendChild(item);
+    });
+    updateEmptyHint();
+  </script>
+</body>
+</html>
