@@ -1,5 +1,5 @@
 // 給這次快取一個名字，之後更新可以改版本號
-const CACHE_NAME = 'nan-todo-v1';
+const CACHE_NAME = 'nan-todo-v2';
 
 const URLS_TO_CACHE = [
   './',
