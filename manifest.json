@@ -1,0 +1,20 @@
+{
+  "name": "南寶寶的待辦小本本",
+  "short_name": "小本本",
+  "start_url": "/nan-todo/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ab83ea",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
