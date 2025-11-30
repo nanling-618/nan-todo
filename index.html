@@ -370,6 +370,20 @@
     });
     updateEmptyHint();
   </script>
+
+  <!-- 新增：註冊 service worker，讓小本本可以離線 -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('./sw.js')
+          .catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+      });
+    }
+  </script>
 </body>
 </html>
+
 
