@@ -296,80 +296,108 @@
   </div>
 
   <script>
-    const input = document.getElementById("todo-input");
-    const addBtn = document.getElementById("add-btn");
-    const list = document.getElementById("todo-list");
-    const emptyHint = document.getElementById("empty-hint");
+    const STORAGE_KEY = 'nan-todo-v1';
+    let todos = [];
 
-    function updateEmptyHint() {
-      emptyHint.style.display = list.children.length ? "none" : "block";
+    function loadTodos() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        todos = Array.isArray(parsed) ? parsed : [];
+      } catch (err) {
+        console.error('載入失敗，初始化空清單');
+        todos = [];
+      }
     }
 
-    function createItem(text) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "todo-item";
+    function saveTodos() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+      } catch (err) {
+        console.error('存檔失敗：', err);
+      }
+    }
 
-      const check = document.createElement("div");
-      check.className = "check-box";
-      const checkInner = document.createElement("span");
-      checkInner.textContent = "";
-      check.appendChild(checkInner);
+    function renderTodos() {
+      const list = document.getElementById("todo-list");
+      const emptyHint = document.getElementById("empty-hint");
+      list.innerHTML = '';
 
-      const span = document.createElement("div");
-      span.className = "todo-text";
-      span.textContent = text;
+      todos.forEach(todo => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "todo-item";
+        if (todo.done) wrapper.classList.add("done");
 
-      const del = document.createElement("button");
-      del.className = "delete-btn";
-      del.textContent = "✕";
+        const check = document.createElement("div");
+        check.className = "check-box";
 
-      check.addEventListener("click", () => {
-        wrapper.classList.toggle("done");
-        checkInner.textContent = wrapper.classList.contains("done") ? "✓" : "";
+        const checkInner = document.createElement("span");
+        checkInner.textContent = todo.done ? "✓" : "";
+        check.appendChild(checkInner);
+
+        check.addEventListener("click", () => {
+          todo.done = !todo.done;
+          wrapper.classList.toggle("done", todo.done);
+          checkInner.textContent = todo.done ? "✓" : "";
+          saveTodos();
+        });
+
+        const textDiv = document.createElement("div");
+        textDiv.className = "todo-text";
+        textDiv.textContent = todo.text;
+
+        const del = document.createElement("button");
+        del.className = "delete-btn";
+        del.textContent = "✕";
+        del.addEventListener("click", () => {
+          todos = todos.filter(t => t.id !== todo.id);
+          saveTodos();
+          renderTodos();
+        });
+
+        wrapper.appendChild(check);
+        wrapper.appendChild(textDiv);
+        wrapper.appendChild(del);
+        list.appendChild(wrapper);
       });
 
-      del.addEventListener("click", () => {
-        wrapper.remove();
-        updateEmptyHint();
-      });
-
-      wrapper.appendChild(check);
-      wrapper.appendChild(span);
-      wrapper.appendChild(del);
-
-      return wrapper;
+      emptyHint.style.display = todos.length ? "none" : "block";
     }
 
     function addTodo() {
+      const input = document.getElementById("todo-input");
       const text = input.value.trim();
       if (!text) return;
-      const item = createItem(text);
-      list.appendChild(item);
-      input.value = "";
+
+      const todo = {
+        id: Date.now(),   // 每個待辦都有固定 ID
+        text,
+        done: false
+      };
+
+      todos.unshift(todo);
+      saveTodos();
+      renderTodos();
+      input.value = '';
       input.focus();
-      updateEmptyHint();
     }
 
-    addBtn.addEventListener("click", addTodo);
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") addTodo();
+    window.addEventListener("load", () => {
+      // 1. 載入資料
+      loadTodos();
+      // 2. 顯示資料
+      renderTodos();
+  
+      const input = document.getElementById("todo-input");
+      const addBtn = document.getElementById("add-btn");
+  
+      addBtn.addEventListener("click", addTodo);
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") addTodo();
+      });
     });
-
-    // 初始狀態
-    updateEmptyHint();
-
-    // 也可以先塞幾句預設示範
-    const defaults = [
-      "親一下嶺寶寶",
-      "今天的事要今天做完♡",
-      "今天太累了不然明天再做吧Zz(ˊᗜˋ*)"
-    ];
-    defaults.forEach((t) => {
-      const item = createItem(t);
-      list.appendChild(item);
-    });
-    updateEmptyHint();
   </script>
+
 
   <!-- 新增：註冊 service worker，讓小本本可以離線 -->
   <script>
@@ -385,5 +413,6 @@
   </script>
 </body>
 </html>
+
 
 
